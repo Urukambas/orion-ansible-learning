@@ -1,0 +1,93 @@
+## Установка Ansible
+С помощью dnf
+```SHELL
+dnf install -y ansible-core
+```
+
+Из репозитория epel-release
+```SHELL
+dnf install -y epel-release
+dnf install -y ansible
+```
+
+С помощью Python:
+```SHELL
+python3 -m ensurepip          # Установить pip, если его нет
+pip3 install --upgrade pip    # Обновить pip
+pip3 install ansible --user   # Установить Ansible для текущего пользователя
+```
+
+Создать виртуальное окружение
+```SHELL
+python3 -m venv .venv         # .venv это название окружения, его можно задать любым
+source .venv/bin/active       # Активировать виртуальное окружение.
+# Также source можно заменить на .(точку)
+. .venv/bin/active
+deactivate                    # Выйти из виртуального окружения
+```
+
+Проверить версию Ansible
+```SHELL
+ansible --version
+```
+
+## Inventory
+Посмотреть список хостов в виде списка:
+```SHELL
+ansible-inventory --list
+```
+В виду графа:
+```SHELL
+ansible-inventory --graph
+```
+
+## Ad-hoc команды
+Выполнить пинг
+```SHELL
+ansible all -m ping
+ansible web_servers -m ping
+```
+
+Собрать информацию об управляемых хостах
+```SHELL
+ansible web1 -m setup           # Общие факты
+ansible web1 -m package_facts   # Собрать информацию об установленных пакетах
+```
+
+Выполнить команду
+```SHELL
+ansible -m shell -a 'whoami'    # -a это передача аргументов или параметров в модуль
+```
+
+*ТЕОРИЯ*: различия shell, command и raw
+shell — позволяет осуществлять конвейеризацию shell
+```SHELL
+ansible web1 -m shell -a 'echo 123 | tee --append ~/file'
+```
+В итоге в файл будет передано то, что вывело echo
+command при этом не выполнит конвейеризацию:
+```SHELL
+ansible web1 -m command -a 'echo 123 | tee --append ~/file'
+```
+В файл ничего не будет записано
+А raw отличается от shell тем, что не происходит обработки python, но конвейеризацию выполнить может
+```SHELL
+ansible web1 -m raw -a 'echo 123 | tee --append ~/file'
+```
+
+Эскалация прав с запросом пароля в консоли:
+```SHELL
+ansible all -m shell -a 'whoami' --become --ask-become-pass  # флаг --become запрашивает эскалацию, а флаг --ask-become-pass позволяет ввести пароль в интерактивном режиме
+```
+
+
+## Playbooks
+Запустить Playbook:
+```SHELL
+ansible-playbook playbook.yaml
+```
+
+Эскалация прав для playbook:
+```SHELL
+ansible-playbook playbook.yamk --become --ask-become-pass
+```

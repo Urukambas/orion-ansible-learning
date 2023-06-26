@@ -1,0 +1,18 @@
+all:
+  children:
+    databases:
+      hosts:
+        database1:
+          ansible_host: host3.ansible.lesson
+          ansible_user: root
+          ansible_ssh_pass: 1
+        database2:
+          ansible_host: host4.ansible.lesson
+          ansible_user: root
+          ansible_ssh_pass: 1
+    prod:
+      hosts:
+        database1:
+    staging:
+      hosts:
+        database2:

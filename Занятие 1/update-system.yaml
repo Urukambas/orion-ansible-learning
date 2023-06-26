@@ -1,0 +1,30 @@
+---
+- name: "Update all servers"
+  hosts: all
+  become: true
+
+  tasks:
+    - name: "Update system"
+      dnf:
+        name: "*"
+        state: latest
+        update_only: true
+
+- name: "Install tree on Web Servers"
+  hosts: web_servers
+  become: true
+
+  tasks:
+    - name: "Install tree"
+      dnf:
+        name: tree
+        state: present
+
+- name: "Install wget on Databases"
+  hosts: databases
+
+  tasks:
+    - name: "Install wget"
+      dnf:
+        name: wget
+        state: present
