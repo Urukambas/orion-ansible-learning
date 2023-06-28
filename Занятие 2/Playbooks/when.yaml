@@ -1,0 +1,47 @@
+---
+- name: "When"
+  hosts: web1
+  become: true
+
+  tasks:
+    - name: "Gather package facts"
+      package_facts:
+    - name: "Debug ansible facts"
+      debug:
+        var: ansible_facts.pkg_mgr
+
+    - name: "Install package with DNF"
+      dnf:
+        name: tree
+        state: present
+      when: ansible_facts.pkg_mgr == "dnf"
+    - name: "Install package with apt"
+      apt:
+        name: tree
+        state: present
+      when: ansible_facts.pkg_mgr == "apt"
+
+    - name: "Check file1"
+      stat:
+        path: /home/ansible-learning/file1
+      register: file1_stat
+    - name: "Check file2"
+      stat:
+        path: /home/ansible-learning/file2
+      register: file2_stat
+    - name: "Debug file1"
+      debug:
+        var: file1_stat.stat.exists
+    - name: "Create file1"
+      file:
+        path: "/home/ansible-learning/file1"
+        state: touch
+      when: not file1_stat.stat.exists
+    - name: "Debug file2"
+      debug:
+        var: file2_stat.stat.exists
+    - name: "Create file2"
+      file:
+        path: "/home/ansible-learning/file2"
+        state: touch
+      when: not file2_stat.stat.exists

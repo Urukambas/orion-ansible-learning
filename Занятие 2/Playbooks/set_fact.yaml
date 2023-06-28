@@ -1,0 +1,27 @@
+---
+- name: "Set Fact"
+  hosts: web1
+
+  vars:
+    file_name: file1
+    file_path: /home/ansible-learning
+    lesson: 2
+  tasks:
+    - name: "Set Fact"
+      set_fact:
+        full_path: "{{ file_path }}/{{ file_name }}"
+    - name: "Set second Fact"
+      set_fact:
+        text: "This is {{ lesson }} lesson"
+
+    - name: "Debug"
+      debug:
+        var: full_path
+    - name: "Debug"
+      debug:
+        msg: "{{ text }}"
+
+    - name: "Create file"
+      file:
+        path: "{{ full_path }}"
+        state: touch

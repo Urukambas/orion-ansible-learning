@@ -1,0 +1,44 @@
+---
+- name: "Update all servers"
+  hosts: all
+  become: true
+
+  tasks:
+    - name: "Update system"
+      dnf:
+        name: "*"
+        state: latest
+        update_only: true
+
+- name: "Install tree on Web Servers"
+  hosts: web_servers
+  become: true
+
+  vars:
+    web_package: tree
+    package: wget
+
+  tasks:
+    - name: "Debug"
+      debug:
+        msg: "Package is {{ package }}"
+    - name: "Install {{ web_package }}"
+      dnf:
+        name: "{{ web_package }}"
+        state: present
+
+- name: "Install wget on Databases"
+  hosts: databases
+
+  vars:
+    database_package: wget
+    package: tree
+
+  tasks:
+    - name: "Debug"
+      debug:
+        msg: "Package is {{ package }}"
+    - name: "Install {{ database_package }}"
+      dnf:
+        name: "{{ database_package }}"
+        state: present

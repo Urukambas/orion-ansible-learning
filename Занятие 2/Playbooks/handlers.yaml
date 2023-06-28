@@ -1,0 +1,50 @@
+---
+- name: "Block"
+  hosts: web1
+  become: true
+
+  vars:
+    zbx_srv: 10.251.1.13
+  tasks:
+    - name: "Install epel-release"
+      dnf:
+        name: epel-release
+        state: present
+    - name: "Package facts"
+      package_facts:
+
+    - block:
+        - name: "Install Zabbix Agent"
+          dnf:
+            name: zabbix-agent
+            state: present
+        - name: "Start and enable Zabbix Agent"
+          service:
+            name: zabbix-agent
+            state: started
+            enabled: true
+      when: ('zabbix-agent' not in ansible_facts.packages)
+
+    - name: "Change config"
+      lineinfile:
+        path: /etc/zabbix_agentd.conf
+        regexp: "^Server="
+        line: "Server={{ zbx_srv }}"
+      notify: restart
+    - name: "Force handlers"
+      meta: flush_handlers
+
+    - pause:
+        seconds: 60
+
+  handlers:
+    - name: "Restart zabbix Agent"
+      service:
+        name: zabbix-agent
+        state: restarted
+      listen: restart
+    - name: "Restart chronyd"
+      service:
+        name: chronyd
+        state: restarted
+      listen: restart

@@ -1,0 +1,17 @@
+---
+- name: "Register"
+  hosts: web1
+
+  tasks:
+    - name: "Check file"
+      stat:
+        path: "/home/ansible-learning/file1"
+      register: file1_stat
+    - name: "Check file2"
+      stat:
+        path: "/home/ansible-learning/file2"
+      register: file2_stat
+    - debug:
+        var: file1_stat
+    - debug:
+        var: file2_stat

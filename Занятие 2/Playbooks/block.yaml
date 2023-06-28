@@ -1,0 +1,25 @@
+---
+- name: "Block"
+  hosts: web1
+  become: true
+
+  tasks:
+    - name: "Install epel-release"
+      dnf:
+        name: epel-release
+        state: present
+    - name: "Package facts"
+      package_facts:
+
+    - block:
+        - name: "Install Zabbix Agent"
+          dnf:
+            name: zabbix-agent
+            state: present
+        - name: "Start and enable Zabbix Agent"
+          service:
+            name: zabbix-agent
+            state: started
+            enabled: true
+      when: ('zabbix-agent' not in ansible_facts.packages)
+

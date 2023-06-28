@@ -1,0 +1,14 @@
+all:
+  children:
+    databases:
+      hosts:
+        database1:
+          ansible_host: host3.ansible.lesson
+        database2:
+          ansible_host: host4.ansible.lesson
+    prod:
+      hosts:
+        database1:
+    staging:
+      hosts:
+        database2:

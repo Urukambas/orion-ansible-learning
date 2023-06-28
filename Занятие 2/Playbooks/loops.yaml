@@ -1,0 +1,25 @@
+---
+- name: "Loops"
+  hosts: web1
+  become: true
+
+  vars:
+    files:
+      - file1
+      - file2
+      - file3
+    count: 5
+  tasks:
+    - name: "Create files"
+      file:
+        path: "{{ file }}"
+        state: touch
+      loop: "{{ files }}" 
+      loop_control:
+        loop_var: file
+    - name: "Loop in range"
+      file:
+        path: "file-{{ item }}"
+        state: touch
+      loop: "{{ range(0, count | int ) }}"
+      

@@ -1,0 +1,35 @@
+---
+- name: "Errors"
+  hosts: web1
+  become: true
+
+  tasks:
+    - name: "Ignore Errors"
+      apt:
+        name: zabbix-agent
+        state: present
+      ignore_errors: true
+
+    - debug:
+        msg: "Success"
+      
+    - block:
+        - name: "Install wget"
+          dnf:
+            name: wget
+            state: present
+      rescue:
+        - name: "Install wget 2"
+          dnf:
+            name: wget
+            state: present
+        
+    - name: "Gather facts"
+      setup:
+    - name:
+      debug:
+        var: ansible_facts.memory_mb
+    - name: "Fail if ram is less than 1GB"
+      fail:
+        msg: "Not enough RAM, required at least 0.5GB"
+      when: ansible_facts.memory_mb.real.total < 512
