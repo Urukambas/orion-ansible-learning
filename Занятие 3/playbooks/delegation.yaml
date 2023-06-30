@@ -1,0 +1,31 @@
+---
+- name: "Delegation"
+  hosts: web1
+  become: true
+
+  tasks:
+    - name: "Create file1"
+      file:
+        path: /root/file1
+        state: touch
+    - name: "Create file2"
+      file:
+        path: /root/file2
+        state: touch
+      delegate_to: web2
+    - name: "Create file3"
+      file:
+        path: /root/file3
+        state: touch
+      delegate_to: host3.ansible.lesson
+    - name: "Create file4"
+      file:
+        path: /root/file4
+        state: touch
+      delegate_to: localhost
+    - name: "Create hosts record"
+      lineinfile:
+        path: ../test
+        line: "{{ ansible_host }} web1 web1.ansible.lesson {{ ansible_facts['distribution'] }}"
+        create: yes
+      delegate_to: localhost

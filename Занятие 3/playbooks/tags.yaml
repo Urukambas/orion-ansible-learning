@@ -1,0 +1,27 @@
+---
+- name: "Tags"
+  hosts: web1
+
+  tasks:
+    - name: "Show distro"
+      debug:
+        var: ansible_facts['distribution']
+      tags:
+        - always
+    - name: "Send msg foo"
+      debug:
+        msg: "Tag foo"
+      tags:
+        - foo
+    - name: "Send msg bar / baz"
+      debug:
+        msg: "Tag bar / baz"
+      tags:
+        - bar
+        - baz
+    - name: "Tag Never"
+      debug:
+        msg: "Never"
+      tags:
+        - never
+        - baz

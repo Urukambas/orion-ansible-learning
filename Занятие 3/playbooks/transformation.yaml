@@ -1,0 +1,33 @@
+---
+- name: "Extract"
+  hosts: all
+  become: true
+
+  vars:
+    dict:
+      key: value
+      foo: bar
+      list:
+        - first
+        - second
+  tasks:
+    - name: "Create file"
+      lineinfile:
+        path: /root/file_yaml
+        line: "{{ dict | to_yaml }}"
+        create: yes
+    - name: "Create file"
+      lineinfile:
+        path: /root/file_nice_yaml
+        line: "{{ dict | to_nice_yaml }}"
+        create: yes
+    - name: "Create file"
+      lineinfile:
+        path: /root/file_json
+        line: "{{ dict }}"
+        create: yes
+    - name: "Create file"
+      lineinfile:
+        path: /root/file_nice_json
+        line: "{{ dict | to_nice_json }}"
+        create: yes

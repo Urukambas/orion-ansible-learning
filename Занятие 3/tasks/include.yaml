@@ -1,0 +1,10 @@
+---
+- name: "Send message"
+  debug:
+    msg: "Success"
+- name: "Debug variable"
+  debug:
+    var: dict
+- name: "Myvar"
+  debug:
+    var: myvar

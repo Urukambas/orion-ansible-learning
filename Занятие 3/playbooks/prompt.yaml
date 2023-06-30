@@ -1,0 +1,21 @@
+---
+- name: "Prompt"
+  hosts: web1
+  become: true
+
+  vars_prompt:
+    - name: "username"
+      prompt: Enter username
+      private: false
+    - name: "password"
+      prompt: Enter password
+      private: true
+    - name: "create_home"
+      prompt: Create home. no / yes
+      private: false
+  tasks:
+    - name: "Create user"
+      user:
+        name: "{{ username }}"
+        password: "{{ password | password_hash('sha512') }}"
+        create_home: "{{ create_home | default('no', true) }}"

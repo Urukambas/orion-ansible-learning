@@ -1,0 +1,13 @@
+---
+- name: "Import and include"
+  hosts: web1
+
+  vars_files:
+    - ../vars/vars.yaml
+  tasks:
+    - import_tasks: ../tasks/import.yaml
+      vars:
+        myvar: "this is import"
+    - include_tasks: ../tasks/include.yaml
+      vars:
+        myvar: "this is include"

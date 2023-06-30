@@ -1,0 +1,27 @@
+---
+- name: "Extract"
+  hosts: all
+  become: true
+
+  vars:
+    host_fqdns: "{{ groups['all'] | map('extract', hostvars, 'ansible_host') }}"
+  tasks:
+    - name: "Debug"
+      debug:
+        var: host_fqdns
+    - name: "Create file"
+      lineinfile:
+        path: /root/file1
+        line: "{{ host_fqdns }}"
+        create: yes
+    - name: "Create file"
+      lineinfile:
+        path: /root/file2
+        line: "{{ item }}"
+        create: yes
+      loop: "{{ host_fqdns }}"
+    - name: "Debug 2"
+      debug:
+        msg: "Item number {{ item }}"
+      loop: "{{ range(0, host_fqdns | length) }}"
+

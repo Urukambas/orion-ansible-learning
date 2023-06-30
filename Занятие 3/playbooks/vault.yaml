@@ -1,0 +1,8 @@
+---
+- name: "Vault"
+  hosts: databases
+
+  tasks:
+    - name: "Debug"
+      debug:
+        var: secret_var

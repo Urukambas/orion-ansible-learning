@@ -1,0 +1,25 @@
+---
+- name: "Json query"
+  hosts: web1
+  become: true
+
+  vars:
+    server_list:
+      servers:
+        - { name: "database1", memory: 4096}
+        - { name: "database2", memory: 2048}
+        - { name: "web1", memory: 2048}
+        - { name: "web2", memory: 1024}
+
+  tasks:
+    - name: "Debug"
+      debug:
+        var: server_list
+    - name: "List servers with more or equal 2048 mb ram"
+      set_fact:
+        servers_with_enough_ram: "{{ server_list | json_query(query) }}"
+      vars:
+        query: "servers[?memory >= `3072`]"
+    - name: "Debug"
+      debug:
+        var: servers_with_enough_ram

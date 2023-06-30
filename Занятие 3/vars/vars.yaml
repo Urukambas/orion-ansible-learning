@@ -1,0 +1,7 @@
+---
+dict:
+  key: value
+  foo: bar
+  list:
+    - first
+    - second
