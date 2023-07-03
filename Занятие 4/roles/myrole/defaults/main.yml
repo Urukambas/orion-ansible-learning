@@ -1,0 +1,12 @@
+---
+my_var: success
+
+site:
+  port: 80
+  ipv6: true
+  server_name:
+    - mysite.ansible.lesson
+    - supersite.ansible.lesson
+    - test.example.ru
+  server_domain: ansible.lesson
+  root_path: /var/www/mysite/

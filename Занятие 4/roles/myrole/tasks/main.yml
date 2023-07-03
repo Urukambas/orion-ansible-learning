@@ -1,0 +1,12 @@
+---
+- import_tasks: update_system.yaml
+
+- dnf:
+    name: nginx
+    state: present
+- service:
+    name: nginx
+    state: started
+    enabled: true
+
+- include_tasks: site.yaml

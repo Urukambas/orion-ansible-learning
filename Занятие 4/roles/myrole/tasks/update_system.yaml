@@ -1,0 +1,6 @@
+---
+- name: "Update"
+  dnf:
+    name: "*"
+    state: latest
+    update_only: true

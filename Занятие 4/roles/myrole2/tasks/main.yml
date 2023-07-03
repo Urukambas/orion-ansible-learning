@@ -1,0 +1,9 @@
+---
+- debug:
+    msg: "Database play"
+- dnf:
+    name: mariadb-server
+    state: present
+- service:
+    name: mariadb
+    state: started

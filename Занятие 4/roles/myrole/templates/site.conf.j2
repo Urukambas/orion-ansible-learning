@@ -1,0 +1,11 @@
+server {
+  listen  {{ site.port }};
+{% if site.ipv6 %}
+  listen  [::]:{{ site.port }};
+{% endif %}
+  server_name   {% for name in site.server_name %} {{ name }} {% endfor %};
+
+  location / {
+    root {{ site.root_path }};
+  }
+}

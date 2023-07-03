@@ -1,0 +1,25 @@
+---
+- name: "Test zVirt"
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: "Login"
+      ovirt_auth:
+        hostname: engine.ts.local
+        username: ansible@internal
+        password: Ansible!@34
+
+    - block:
+        - name: "Debug"
+          debug:
+            msg: "Success"
+        - name: "Fail"
+          fail:
+            msg: "FAIL!!!"
+          when: (ovirt_auth is defined)
+      always:
+        - name: "Logout"
+          ovirt_auth:
+            ovirt_auth: "{{ ovirt_auth }}"
+            state: absent
