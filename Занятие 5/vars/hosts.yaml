@@ -1,0 +1,4 @@
+---
+hosts_list:
+  - { address: "zvirt-host2.uruk.local", hosted_engine: "deploy" }
+  - { address: "zvirt-host3.uruk.local" }

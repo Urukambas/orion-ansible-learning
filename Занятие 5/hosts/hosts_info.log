@@ -1,0 +1,7 @@
+-   address: zvirt-host1.uruk.local
+    iname: iqn.1994-05.com.redhat:76e467203d93
+-   address: zvirt-host2.uruk.local
+    iname: iqn.1994-05.com.redhat:08254f0c5cc8
+-   address: zvirt-host3.uruk.local
+    iname: iqn.1994-05.com.redhat:08254f0c5cc8
+

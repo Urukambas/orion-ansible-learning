@@ -1,0 +1,36 @@
+---
+vms:
+  - {
+      name: "Alma8Minimal",
+      template: "Alma8Template",
+      profile: "minimal",
+      nic_name: "eth0",
+    }
+  - {
+      name: "Alma8Medium",
+      template: "Alma8Template",
+      profile: "medium",
+      nic_name: "eth0",
+      nic_boot_proto: static,
+      ip_address: "10.0.234.150",
+    }
+  - {
+      name: "Alma9Medium",
+      template: "Alma9Template",
+      profile: "medium",
+      nic_name: "enp1s0",
+      nic_boot_proto: static,
+      ip_address: "10.0.234.160",
+    }
+vms2:
+  - { name: "Alma9-01", template: "cloudinitest", profile: "minimal" }
+  - { name: "Alma9-02", template: "cloudinitest", profile: "minimal" }
+profiles:
+  - { name: "minimal", cpu_cores: 1, memory: 2048 }
+  - { name: "medium", cpu_cores: 2, memory: 4096 }
+  - { name: "large", cpu_cores: 4, memory: 8192 }
+network_config:
+  dns_servers: "8.8.8.8 1.1.1.1"
+  dns_search: "uruk.local"
+  netmask: 255.255.255.0
+  gateway: 10.0.0.1

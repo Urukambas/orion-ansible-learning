@@ -1,0 +1,41 @@
+---
+- name: "Hosts Info"
+  hosts: localhost
+  gather_facts: false
+
+  vars_files:
+    - ../vars/hosts.yaml
+
+  tasks:
+    - name: "Login"
+      ovirt_auth:
+        hostname: "zvirt-manager.uruk.local"
+        username: ansible@internal
+        password: Ansible!@34
+    - block:
+        - name: "Add hosts"
+          ovirt_host:
+            auth: "{{ ovirt_auth }}"
+            cluster: "{{ host.cluster | default('Default') }}"
+            name: "{{ host.address }}"
+            address: "{{ host.address }}"
+            password: "{{ host.password | default('root') }}"
+            hosted_engine: "{{ host.hosted_engine | default(omit) }}"
+          async: 300
+          poll: 0
+          loop: "{{ hosts_list }}"
+          loop_control:
+            loop_var: host
+        - name: "Wait for hosts to be added"
+          pause:
+            minutes: 6
+      always:
+        - name: "Logout"
+          ovirt_auth:
+            ovirt_auth: "{{ ovirt_auth }}"
+            state: absent
+        - name: "Restart ovirt-engine"
+          service:
+            name: ovirt-engine
+            state: restarted
+          delegate_to: zvirt

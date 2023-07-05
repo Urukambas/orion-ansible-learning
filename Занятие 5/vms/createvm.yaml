@@ -1,0 +1,50 @@
+---
+- name: "Hosts Info"
+  hosts: localhost
+  gather_facts: false
+
+  vars_files:
+    - ../vars/vms.yaml
+
+  tasks:
+    - name: "Login"
+      ovirt_auth:
+        hostname: "zvirt-manager.uruk.local"
+        username: ansible@internal
+        password: Ansible!@34
+    - block:
+        - name: "Create VMs"
+          ovirt_vm:
+            auth: "{{ ovirt_auth }}"
+            name: "{{ vm.name }}"
+            state: running
+            template: "{{ vm.template }}"
+            cluster: "{{ vm.cluster | default('Default') }}"
+            cpu_cores: "{{ profiles | selectattr('name', '==', vm.profile) | map(attribute='cpu_cores') | first }}"
+            memory: "{{ profiles | selectattr('name', '==', vm.profile) | map(attribute='memory') | first }}MiB"
+            memory_max: "{{ profiles | selectattr('name', '==', vm.profile) | map(attribute='memory') | first }}MiB"
+            cloud_init:
+              dns_servers: "{{ network_config.dns_servers }}"
+              dns_search: "{{ network_config.dns_search }}"
+              nic_boot_protocol: "{{ vm.nic_boot_proto | default('dhcp') }}"
+              nic_ip_address: "{{ vm.ip_address | default(omit) }}"
+              nic_netmask: "{{ network_config.netmask }}"
+              nic_gateway: "{{ network_config.gateway }}"
+              nic_name: "{{ vm.nic_name | default(omit) }}"
+              host_name: "{{ vm.name }}.{{ network_config.dns_search }}"
+              custom_script: |
+                runcmd:
+                - echo InitiatorName=$(iscsi-iname) > /etc/iscsi/initiatorname.iscsi
+                - systemctl restart iscsid
+          async: 60
+          poll: 0
+          loop: "{{ vms2 }}"
+          loop_control:
+            loop_var: vm
+        - pause:
+            seconds: 90
+      always:
+        - name: "Logout"
+          ovirt_auth:
+            ovirt_auth: "{{ ovirt_auth }}"
+            state: absent

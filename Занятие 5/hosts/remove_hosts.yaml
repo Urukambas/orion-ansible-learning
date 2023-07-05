@@ -1,0 +1,41 @@
+---
+- name: "Hosts Info"
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: "Login"
+      ovirt_auth:
+        hostname: "zvirt-manager.uruk.local"
+        username: ansible@internal
+        password: Ansible!@34
+    - block:
+        - name: "Remove second host"
+          ovirt_host:
+            auth: "{{ ovirt_auth }}"
+            state: absent
+            cluster: Default
+            name: zvirt-host2.uruk.local
+            address: zvirt-host2.uruk.local
+            password: root
+            hosted_engine: deploy
+          async: 90
+          poll: 10
+        - name: "Remove third host"
+          ovirt_host:
+            auth: "{{ ovirt_auth }}"
+            state: absent
+            cluster: Default
+            name: zvirt-host3.uruk.local
+            address: zvirt-host3.uruk.local
+            password: root
+          async: 90
+          poll: 10
+        - name: "Wait for hosts to be added"
+          pause:
+            minutes: 1
+      always:
+        - name: "Logout"
+          ovirt_auth:
+            ovirt_auth: "{{ ovirt_auth }}"
+            state: absent

@@ -1,0 +1,1 @@
+zvirt ansible_host=zvirt-manager.uruk.local ansible_user=root ansible_ssh_pass=root
