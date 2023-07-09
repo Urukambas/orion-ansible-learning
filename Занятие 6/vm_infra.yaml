@@ -1,0 +1,77 @@
+---
+- name: "zVirt VM Infra"
+  hosts: localhost
+
+  vars:
+    engine_fqdn: zvirt-manager.uruk.local
+    engine_user: admin@internal
+    engine_password: admin
+
+    dev_web:
+      cluster: Dev
+      domain: uruk.local
+      template: Alma9Template
+      memory: 2GiB
+      cores: 2
+      disks:
+        - size: 10GiB
+          name: data
+          storage_domain: host2_share
+          interface: virtio
+      nics:
+        - name: DevNetwork
+          network: DevNetwork
+          profile: DevNetwork
+    dev_db:
+      cluster: Dev
+      domain: uruk.local
+      template: Alma9Template
+      memory: 2GiB
+      cores: 2
+      disks:
+        - size: 20GiB
+          name: pgdata
+          storage_domain: host2_share
+          interface: virtio
+      nics:
+        - name: DevNetwork
+          network: DevNetwork
+          profile: DevNetwork
+
+    prod_web:
+      cluster: Production
+      domain: uruk.local
+      template: Alma9Template
+      memory: 4GiB
+      cores: 2
+      disks:
+        - size: 25GiB
+          name: data
+          storage_domain: host4_share
+          interface: virtio
+      nics:
+        - name: ProductionNetwork
+          network: ProductionNetwork
+          profile: ProductionNetwork
+    
+    vms:
+      - name: dev-nginx-01
+        state: running
+        tag:
+          - dev
+          - web
+        profile: "{{ dev_web }}"
+      - name: dev-postgresql-01
+        state: running
+        tag: 
+          - dev
+          - db
+        profile: "{{ dev_db }}"
+      - name: prod-nginx-01
+        state: running
+        tag:
+          - prod
+          - web
+        profile: "{{ prod_web }}"
+  roles:
+    - ovirt.vm-infra
