@@ -1,0 +1,16 @@
+plugin: ovirt.ovirt.ovirt
+ovirt_url: "https://zvirt.uruk.local/ovirt-engine/api"
+ovirt_insecure: true
+ovirt_cafile: ../ca.cer
+ovirt_username: admin@internal
+ovirt_password: admin
+ovirt_query_filter:
+  search: "name=*"
+  case_sensitive: no
+keyed_groups:
+  - key: cluster
+    prefix: "cluster"
+  - key: tags
+    prefix: "tag"
+compose:
+  ansible_host: devices["enp1s0"][0]

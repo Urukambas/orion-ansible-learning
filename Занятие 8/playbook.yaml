@@ -1,0 +1,46 @@
+---
+- name: "Create VM"
+  hosts: localhost
+  gather_facts: false
+  vars:
+    vms:
+      - { name: vm-01, ip_addr: 10.0.150.150 }
+  tasks:
+    - name: "Login"
+      ovirt.ovirt.ovirt_auth:
+        hostname: zvirt.uruk.local
+        username: admin@internal
+        password: admin
+    - block:
+        - name: "Create VM"
+          ovirt.ovirt.ovirt_vm:
+            auth: "{{ ovirt_auth }}"
+            state: "{{ item.state | default('running') }}"
+            name: "{{ item.name  }}"
+            cluster: Default
+            template: Alma9Template
+            cloud_init:
+              nic_boot_protocol: static
+              nic_name: enp2s0
+              nic_ip_address: "{{ item.ip_addr }}"
+              nic_netmask: 255.255.0.0
+              nic_gateway: 10.0.0.1
+              host_name: "{{ item.name }}.uruk.local"
+              dns_servers: "8.8.8.8 1.1.1.1"
+          loop: "{{ vms }}"
+      always:
+        - name: "Logout"
+          ovirt.ovirt.ovirt_auth:
+            ovirt_auth: "{{ ovirt_auth }}"
+            state: absent
+    - name: "NSupdate"
+      community.general.nsupdate:
+        state: "{{ item.state | default('present') }}"
+        key_name: "tsig-key."
+        key_secret: "W6rNQvCU59j4+ZJHtUhxhxcCaAClKkbydVbPkiD3mTs="
+        key_algorithm: "hmac-sha256"
+        server: "10.0.212.223"
+        zone: "uruk.local"
+        record: "{{ item.name }}"
+        value: "{{ item.ip_addr}}"
+      loop: "{{ vms }}"

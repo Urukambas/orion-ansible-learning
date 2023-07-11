@@ -1,0 +1,26 @@
+---
+- name: "Apache"
+  hosts: apache
+  become: true
+
+  tasks:
+    - name: "Install Apache"
+      dnf:
+        name: httpd
+        state: present
+    - name: "Start Apache"
+      service:
+        name: httpd
+        state: started
+        enabled: true
+    - name: "Firewalld"
+      firewalld:
+        port: 80/tcp
+        state: enabled
+        permanent: true
+      notify: "Restart Firewalld"
+  handlers:
+    - name: "Restart Firewalld"
+      service:
+        name: firewalld
+        state: restarted

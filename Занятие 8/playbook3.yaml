@@ -1,0 +1,70 @@
+---
+- name: "Lets Encrypt"
+  hosts: nginx
+  become: true
+  gather_facts: false
+
+  vars_files:
+    - vars/acme_private_key.yaml
+    - vars/main.yaml
+  tasks:
+    - name: "Generate Nginx Config"
+      template:
+        src: vm-01.conf.j2
+        dest: /etc/nginx/conf.d/vm-01.conf
+    - name: "Restart Nginx"
+      service:
+        name: nginx
+        state: restarted
+
+    - pause:
+        minutes: 100
+
+    - name: "Generate openssl privkey"
+      community.crypto.openssl_privatekey:
+        path: /etc/ssl/nginx/vm-01.key
+    - name: "CSR"
+      openssl_csr:
+        path: /etc/ssl/nginx/vm-01.csr
+        privatekey_path: /etc/ssl/nginx/vm-01.key
+        common_name: "vm-01.uruk.pro"
+    - name: "ACME Challenge"
+      community.crypto.acme_certificate:
+        account_key_content: "{{ lets_encrypt_account_key }}"
+        account_email: "{{ lets_encrypt_account_email }}"
+        src: /etc/ssl/nginx/vm-01.csr
+        dest: /etc/ssl/nginx/vm-01.crt
+        acme_directory: https://acme-v02.api.letsencrypt.org/directory
+        acme_version: "2"
+        terms_agreed: "true"
+      register: acme_challenge_result
+    - debug:
+        var: acme_challenge_result
+    - name: "Copy token"
+      copy:
+        dest: "/var/www/letsencrypt/{{ acme_challenge_result['challenge_data']['vm-01.uruk.pro']['http-01']['resource'] }}"
+        content: "{{ acme_challenge_result['challenge_data']['vm-01.uruk.pro']['http-01']['resource_value'] }}"
+      when: acme_challenge_result.changed
+
+    - pause:
+        minutes: 100
+
+    - name: "Validate Challenge"
+      community.crypto.acme_certificate:
+        account_key_content: "{{ lets_encrypt_account_key }}"
+        account_email: "{{ lets_encrypt_account_email }}"
+        src: /etc/ssl/nginx/vm-01.csr
+        dest: /etc/ssl/nginx/vm-01.crt
+        acme_directory: https://acme-v02.api.letsencrypt.org/directory
+        acme_version: "2"
+        terms_agreed: "true"
+        data: "{{ acme_challenge_result }}"
+
+    - name: "Nginx config 2"
+      template:
+        src: vm-01-ssl.conf.j2
+        dest: /etc/nginx/conf.d/vm-01.conf
+    - name: "Restart Nginx"
+      service:
+        name: nginx
+        state: restarted
